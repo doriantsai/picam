@@ -28,10 +28,17 @@
     sudo apt upgrade
     sudo apt install build-essential vim-gtk terminator openssh-server git gcc make cmake pkg-config zip unzip g++ curl dkms wget exfat-fuse exfat-utils guvcview net-tools ffmpeg cheese -y
 
+# setup ssh
+See https://github.com/doriantsai/linux-setup/blob/main/ssh_setup.md
+
 # git config?
     git config --global user.name "Dorian Tsai"
     git config --global user.email dorian.tsai@gmail.com
 
+# clone relevant repos
+    git clone git@github.com:doriantsai/picam.git
+    git clone git@github.com:doriantsai/cslics.git
+    
 # vim
     mkdir -p ~/.vim/autoload ~/.vim/bundle && \
     curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
