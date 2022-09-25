@@ -23,3 +23,31 @@
 - wifi driver issues on Model 2, but should be alleviated with Model 4 that has built-in wifi
 - 
 
+# scripts to install:
+    sudo apt update
+    sudo apt upgrade
+    sudo apt install build-essential vim-gtk terminator openssh-server git gcc make cmake pkg-config zip unzip g++ curl dkms wget exfat-fuse exfat-utils guvcview net-tools ffmpeg cheese -y
+
+# git config?
+    git config --global user.name "Dorian Tsai"
+    git config --global user.email dorian.tsai@gmail.com
+
+# vim
+    mkdir -p ~/.vim/autoload ~/.vim/bundle && \
+    curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+# add pathogen/infect line to .vimrc
+    echo -e "execute pathogen#infect()" >> ~/.vimrc
+    echo -e "syntax on" >> ~/.vimrc
+    echo -e "filetype plugin indent on" >> ~/.vimrc
+# install vim-sensible
+    cd ~/.vim/bundle && \
+    git clone https://github.com/tpope/vim-sensible.git
+    echo -e "colorscheme murphy" >> ~/.vimrc
+
+# vscode
+    sudo apt install software-properties-common apt-transport-https -y
+    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+    sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
+    sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
+    sudo apt update
+    sudo apt install code
