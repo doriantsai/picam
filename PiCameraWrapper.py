@@ -12,34 +12,67 @@ import datetime
 import time
 from PIL import Image
 
+from config_camera import read_conf
+
 
 class PiCameraWrapper:
 
     def __init__(self, 
-                 camera_index, 
-                 resolution,
-                 iso,
-                 shutter_speed,
-                 awb_gains):
-        # TODO Python type-setting to ensure valid input types
+                 config_file: str = None,
+                 camera_index: int = 1,
+                 resolution: tuple = (2592, 1944),
+                 iso: int = 400,
+                 exposure_mode: str = 'auto',
+                 shutter_speed: int = 10000,
+                 awb_red_gain: float = -1.0,
+                 awb_blue_gain: float = -1.0):
         # TODO document input units
         # shutterspeed in [mpip3s]
         # iso is image gain, (100-800)
         # init Camera object (wrapper for picam)
 
-        self.camera_index = camera_index
-        self.camera = self.get_picamera(resolution)
         PiCamera.CAPTURE_TIMEOUT = 266.0    # double how long we are willing to wait for the camera to capture
-        if self.camera.resolution != resolution:
-            # apply desired resolution
-            self.camera.resolution = resolution
-        self.camera.iso = iso
-        self.camera.exposure_mode = 'auto'    
-        self.camera.shutter_speed = shutter_speed
+
+        if config_file is not None:
+            conf = read_conf(config_file)
+            self.camera = self.get_picamera(conf.resolution)
+            self.apply_conf(conf)
+
+        else:
+            # TODO: should these invoke the setting methods, as in apply_conf?
+            self.camera_index = camera_index
+            self.camera = self.get_picamera(resolution)
         
-        if awb_gains[0] > 0 and awb_gains[1] > 0:
-            self.camera.awb_mode = 'off'
-            self.camera.awb_gains = awb_gains
+        
+            if self.camera.resolution != resolution:
+                # apply desired resolution
+                self.camera.resolution = resolution
+            self.camera.iso = iso
+            self.camera.exposure_mode = 'auto'    
+            self.camera.shutter_speed = shutter_speed
+        
+            if awb_red_gain > 0 and awb_blue_gain > 0:
+                self.camera.awb_mode = 'off'
+                self.camera.awb_gains = (awb_red_gain, awb_blue_gain)
+            else:
+                self.camera.awb_mode = 'auto'
+
+
+    def apply_conf(self, conf):
+        # apply config to picamera
+        self.set_camera_index(conf.camera_index)
+        # import code
+        # code.interact(local=dict(globals(), **locals()))
+        self.set_resolution(conf.resolution[0], conf.resolution[1])
+        self.set_awb_gains(conf.red_gain, conf.blue_gain)
+        self.set_iso(conf.iso)
+        self.set_shutter_speed(conf.shutter_speed)
+        self.set_exposure_mode(conf.exposure_mode)
+
+
+    def set_exposure_mode(self, exposure_mode: str = 'auto'):
+        # TODO: valid exposure modes
+        self.camera.exposure_mode = exposure_mode
 
 
     def turn_off_auto_adjust(self):
@@ -81,24 +114,36 @@ class PiCameraWrapper:
     def set_iso(self, iso: int = None):
         if iso is None:
             return
+        valid_iso_range = {0, 100, 200, 320, 400, 500, 640, 800}
+        if iso not in valid_iso_range:
+            print(f'warning: iso not in valid iso range: {iso}, default set to 0')
+            iso = 0
         self.camera.iso = iso
 
 
     def set_resolution(self, width=None, height=None):
+        # TODO valid resolutions for HQ PiCam
         if width is None or height is None:
             return
         self.camera.resolution = (width, height)
 
     
     def set_awb_gains(self, red=None, blue=None):
+        # valid gains from 0.0 - 8.0
         if red is None and blue is None:
+            self.camera.awb_mode = 'auto'
             return
         if red is None:
             red = self.camera.awb_gains[0]
         if blue is None:
             blue = self.camera.awb_gains[1]
         self.camera.awb_mode = 'off'
-        self.camera.awb_gains = (red, blue)
+        if (red > 0.0 and red < 8.0) and (blue > 0.0 and blue < 8.0):
+            self.camera.awb_gains = (red, blue)
+        else:
+            print(f'Warning: awb_gains red and blue are (red={red}, blue={blue}), must be between 0.0-8.0')
+            print(f'Setting default awb_gains to (0, 0)')
+            self.camera.awb_gains = (1.0, 1.0)
 
     
     def capture_image(self, img_name=None, save_img=False):
@@ -183,19 +228,21 @@ class PiCameraWrapper:
 if __name__ == "__main__":
 
     # main function
-    # TODO: read config file
     # create camera object
     # set parameters
     # capture an image
 
-    camera_index = 1
-    resolution = (2592, 1944)
-    iso = 100
-    shutter_speed = 10000 # [us]
-    awb_gains = (0.5, 1.5)
+    # camera_index = 1
+    # resolution = (2592, 1944)
+    # iso = 100
+    # shutter_speed = 10000 # [us]
+    # awb_gains = (0.5, 1.5)
+
 
     print('setting picamerawrapper')
-    PiCam = PiCameraWrapper(camera_index, resolution, iso, shutter_speed, awb_gains)
+    # PiCam = PiCameraWrapper(camera_index, resolution, iso, shutter_speed, awb_gains)
+    config_file = 'config_camera.json'
+    PiCam = PiCameraWrapper(config_file=config_file)
 
     # check camera settings:
     param = PiCam.get_params()

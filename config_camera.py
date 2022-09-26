@@ -51,10 +51,6 @@ def read_conf(config_file: str = None):
     camera_index = int(conf.get('camera_index', -1))
     
     iso = int(conf.get('iso', 0))
-    valid_iso_range = {0, 100, 200, 320, 400, 500, 640, 800}
-    if iso not in valid_iso_range:
-        print(f'warning: iso not in valid iso range: {iso}, default set to 0')
-        iso = 0
 
     resolution_def = (2592, 1944)
     resolution = conf.get('resolution', resolution_def)
