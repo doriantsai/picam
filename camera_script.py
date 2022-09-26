@@ -9,19 +9,19 @@ import time
 print('starting picamera capture')
 picam = PiCamera()
 picam.iso = 800
-picam.sensor_mode=3
-picam.resolution = (1024, 768)
-picam.shutter_speed = 10000
+picam.sensor_mode=2
+picam.resolution = (2592, 1944)
+picam.shutter_speed = 10000 # 10 ms
 picam.start_preview()
 
 # give camera some time to adjust to conditions
-time.sleep(10)
-picam.capture('test.jpg')
+time.sleep(2)
+picam.capture('la.jpg')
 
 # try capture a sequence
-print('test capture sequence')
-picam.framerate=30
-picam.capture_sequence(['image%02d.jpg'%(i) for i in range(0,5)])
+#print('test capture sequence')
+#picam.framerate=30
+#picam.capture_sequence(['image%02d.jpg'%(i) for i in range(0,5)])
 
     
 print('all done')
