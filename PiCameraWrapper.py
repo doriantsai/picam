@@ -23,7 +23,7 @@ class PiCameraWrapper:
                  awb_gains):
         # TODO Python type-setting to ensure valid input types
         # TODO document input units
-        # shutterspeed in [ms]
+        # shutterspeed in [mpip3s]
         # iso is image gain, (100-800)
         # init Camera object (wrapper for picam)
 
@@ -42,7 +42,17 @@ class PiCameraWrapper:
             self.camera.awb_gains = awb_gains
 
 
-    def rest_auto_adjust(self):
+    def turn_off_auto_adjust(self):
+        """
+        turn off auto adjustment (exposure mode to not)
+        exposure mode to off
+        awb off
+        """
+        self.camera.exposure_mode = 'off'
+        self.camera.awb_mode = 'off'
+
+
+    def reset_auto_adjust(self):
         """
         rest the camera to using auto-exposure and auto white balance.
         Undoes any fixed awb gains or custom auto adjust
@@ -52,8 +62,23 @@ class PiCameraWrapper:
         self.camera.exposure_mode = 'auto'
         self.camera.awb_mode = 'auto'
 
+
+    def set_shutter_speed(self, shutter_speed=None):
+        if shutter_speed is None:
+            return
+        # framerate vs shutter_speed
+        # current_framerate = self.camera.framerate
+        new_framerate = int(1000000 / float(int(shutter_speed))
+        )
+        self.camera.framerate = min(new_framerate, 30)
+        self.camera.shutter_speed = shutter_speed
+
     
-    def set_iso(self, iso=None):
+    def set_camera_index(self, camera_index):
+        self.camera_index = camera_index
+
+
+    def set_iso(self, iso: int = None):
         if iso is None:
             return
         self.camera.iso = iso
@@ -166,7 +191,7 @@ if __name__ == "__main__":
     camera_index = 1
     resolution = (2592, 1944)
     iso = 100
-    shutter_speed = 10000 # us
+    shutter_speed = 10000 # [us]
     awb_gains = (0.5, 1.5)
 
     print('setting picamerawrapper')
@@ -175,9 +200,17 @@ if __name__ == "__main__":
     # check camera settings:
     param = PiCam.get_params()
     print(param['resolution'])
+    print(param['exposure_mode'])
 
+    # capture image
     print('capturing image')
     PiCam.capture_image(save_img=True)
+
+    # set parameters (turn off auto)
+    PiCam.turn_off_auto_adjust()
+    param_new = PiCam.get_params()
+    print(param_new['exposure_mode'])
+
 
     print('done')
 

@@ -55,6 +55,9 @@ See https://github.com/doriantsai/linux-setup/blob/main/ssh_setup.md
     git clone https://github.com/tpope/vim-sensible.git
     echo -e "colorscheme murphy" >> ~/.vimrc
 
+# coding nice-to-haves
+    pip3 install mypy
+    
 # vscode
     sudo apt install software-properties-common apt-transport-https -y
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
@@ -62,3 +65,12 @@ See https://github.com/doriantsai/linux-setup/blob/main/ssh_setup.md
     sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
     sudo apt update
     sudo apt install code
+
+# installing machine vision toolbox (Python)
+
+    sudo apt install libatlas-base-dev
+    pip3 install --upgrade matplotlib
+    pip3 install --upgrade numpy
+    
+    git clone git@github.com:petercorke/machinevision-toolbox-python.git
+    pip3 install -e .
