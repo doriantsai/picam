@@ -2,7 +2,6 @@
 
 # pi camera wrapper object
 # configure camera settings
-# TODO read configuration file to set relevant picamera configuration parameters
 # documentation for PiCamera module: https://picamera.readthedocs.io/en/release-1.13/api_camera.html
 
 import json
