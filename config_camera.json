@@ -1,0 +1,13 @@
+{
+    "camera_index": 1,
+    "resolution": [
+        2592,
+        1944
+    ],
+    "iso": 400,
+    "red_gain": -1.0,
+    "blue_gain": -1.0,
+    "awb_mode": "auto",
+    "shutter_speed": 10000,
+    "exposure_mode": "auto"
+}
