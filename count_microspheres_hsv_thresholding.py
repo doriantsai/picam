@@ -35,8 +35,6 @@ img_pil, img_name = PiCam.capture_image(save_dir = out_dir)
 # print(param_new['shutter_speed'])
 # PiCam.capture_image(save_img=True)
 
-
-
 # now, read in images from HQ camera and perform count:
 # print('get all files in image directory')
 # img_dir = 'images'
@@ -52,8 +50,8 @@ img_pil, img_name = PiCam.capture_image(save_dir = out_dir)
 print(f'Investigating image: {img_name}')
 img = mvt.Image(img_name)
 
-# NOTE: TODO - resize image, because it's too large for the 2GB pi
-# blur image to make thresholding easier and less noisy
+# # NOTE: TODO - resize image, because it's too large for the 2GB pi
+# # blur image to make thresholding easier and less noisy
 # print('smoothing image')
 # img = img.smooth(sigma=3)
 # img.disp(title='color image')
