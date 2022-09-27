@@ -6,9 +6,11 @@ from PiCameraWrapper import PiCameraWrapper as PCW
 import time
 import os
 import machinevisiontoolbox as mvt
-# import cv2 as cv
+import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
+# from PIL import Image
+
 
 # config_file = 'config_camera.json'
 # PiCam = PCW(config_file=config_file)
@@ -73,25 +75,110 @@ hsv0.disp(title='hsv0 - value')
 # hsv0.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv0.png'))
 # try writing images using matplot lib, as opencv doesn't handle image floats well
 plt.imshow(hsv0.image)
-plt.savefig(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv0-value.png'))
+plt.savefig(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv0-value-plot.png'))
+# plt.imsave(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv0-value-image.png'),
+        #    hsv0.image)
+np.save(os.path.join(out_dir,os.path.basename(img_name)[:-4] + '_hsv0.npy'), hsv0.image)
 
 hsv1 = mvt.Image(hsv.image[:,:,1])
 # hsv1.disp(title='hsv1 - saturation')
 # hsv1.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv1.png'))
 plt.imshow(hsv1.image)
-plt.savefig(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv1-saturation.png'))
+plt.savefig(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv1-saturation-plot.png'))
+# plt.imsave(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv1-saturation-image.png'),
+#            hsv1.image)
+np.save(os.path.join(out_dir,os.path.basename(img_name)[:-4] + '_hsv1.npy'), hsv1.image)
+
 
 hsv2 = mvt.Image(hsv.image[:,:,2])
 # hsv2.disp(title='hsv2 - hue')
 # hsv2.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv2.png'))
 plt.imshow(hsv2.image)
-plt.savefig(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv2-hue.png'))
+plt.savefig(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv2-hue-plot.png'))
+# plt.imsave(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv2-hue-image.png'),
+#            hsv2.image)
+np.save(os.path.join(out_dir,os.path.basename(img_name)[:-4] + '_hsv2.npy'), hsv2.image)
+
+
 
 # make hsv histogram
 hhsv = mvt.Image.hist(hsv, nbins=256)
 fighsv, axhsv = hsv.plothist(hhsv)
 fighsv.savefig(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv_hist.png'))
 
+# plt.show()
 
-import code
-code.interact(local=dict(globals(), **locals()))
+# get thresholds via manual inspection!
+# (see view_image.py)
+
+
+# hue (colour)
+H_min = 340
+H_max = 360
+
+# saturation (amt of grey)
+S_min = 0.6
+S_max = 1.0
+
+# value (brightness)
+V_min = 0.6
+V_max = 0.8
+
+
+# do thresholds for each
+
+imt_hue = cv.inRange(hsv0.image, H_min, H_max)
+imt_sat = cv.inRange(hsv1.image, S_min, S_max)
+imt_val = cv.inRange(hsv2.image, V_min, V_max)
+
+# display each thresholded image (i.e. each channel)
+plt.imsave(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hue_threshold.png'), imt_hue)
+plt.imsave(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_sat_threshold.png'), imt_sat)
+plt.imsave(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_val_threshold.png'), imt_val)
+
+# all in one threshold:
+hsv_min_thresh = (H_min, S_min, V_min)
+hsv_max_thresh = (H_max, S_max, V_max)
+imt = cv.inRange(hsv.image, hsv_min_thresh, hsv_max_thresh)
+imt = mvt.Image(imt)
+
+plt.imsave(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv_threshold.png'), imt.image)
+
+# perform morphological operations to clean up the thresholded image
+# try to separate connections
+
+imt = imt.open(se=np.ones((5,5)))
+imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt_open1.png'))
+
+imt = imt.close(se=np.ones((5,5)))
+imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt_close1.png'))
+
+imt = imt.open(se=np.ones((5,5)))
+imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt_open2.png'))
+
+imt = imt.close(se=np.ones((7,7)))
+imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt_close2.png'))
+
+imt = imt.open(se=np.ones((23,23)))
+imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt_open3.png'))
+
+imt = imt.erode(se=np.ones((7,7)))
+imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt_erode1.png'))
+
+# now count blobs!
+print('blob analysis')
+
+b = mvt.Blob(imt)
+
+# show blobs
+imb = b.drawBlobs(imt, None, None, None, contourthickness=-1)
+imb.disp('blobs')
+b.printBlobs()
+imb.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imb.png'))
+
+# done! perhaps there's a better way:
+# 1) Hough transforms
+# 2) machine learning (which we ultimately need to do for the variation in shapes/sizes of real coral spawn)
+
+# import code
+# code.interact(local=dict(globals(), **locals()))
