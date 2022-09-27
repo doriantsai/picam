@@ -59,7 +59,11 @@ def read_conf(config_file: str = None):
         resolution = resolution_def
     
     red_gain = float(conf.get('red_gain', -1.0))
+    if red_gain < 0:
+        red_gain = None
     blue_gain = float(conf.get('blue_gain', -1.0))
+    if blue_gain < 0:
+        blue_gain = None
 
     awb_mode = str(conf.get('awb_mode', 'auto'))
 

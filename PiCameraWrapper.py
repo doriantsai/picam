@@ -145,7 +145,7 @@ class PiCameraWrapper:
             self.camera.awb_gains = (1.0, 1.0)
 
     
-    def capture_image(self, img_name=None, save_img=False):
+    def capture_image(self, img_name=None, save_dir=None):
         """
         capture and return a single image using PIL
         """
@@ -153,14 +153,16 @@ class PiCameraWrapper:
             datestr = datetime.datetime.now()
             img_name = datestr.strftime("%Y%m%d_%H%M%S") + '_img'
 
-        if save_img is True:
-            
-            self.camera.capture(img_name + '.png', format='png')
-            return
-        else:
-            self.camera.capture(img, format='png')
-            img_pil = Image.open(img)
-            return img_pil
+        if save_dir is not None:
+            img_name = os.path.join(save_dir, img_name)
+
+        # TODO right now, returning image name vs image is not good
+        # TODO make consistent output
+
+        self.camera.capture(img_name, format='png')
+        img_pil = Image.open(img_name)
+
+        return img_pil, img_name
 
     
     def get_picamera(self, resolution=None):
@@ -250,7 +252,7 @@ if __name__ == "__main__":
 
     # capture image
     print('capturing image')
-    PiCam.capture_image(save_img=True)
+    img_pil, img_name = PiCam.capture_image(save_dir='output')
 
     # set parameters (turn off auto)
     PiCam.turn_off_auto_adjust()

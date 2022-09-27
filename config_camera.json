@@ -1,8 +1,8 @@
 {
     "camera_index": 1,
     "resolution": [
-        2592,
-        1944
+        1920,
+        1080
     ],
     "iso": 400,
     "red_gain": -1.0,

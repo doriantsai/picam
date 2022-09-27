@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 # requires PiCam install
-# from PiCameraWrapper import PiCameraWrapper
+
 from PiCameraWrapper import PiCameraWrapper as PCW
 import time
 import os
@@ -11,16 +11,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 # from PIL import Image
 
+# make output folder:
+print('create output folder')
+out_dir = 'output'
+os.makedirs(out_dir, exist_ok=True)
 
-# config_file = 'config_camera.json'
-# PiCam = PCW(config_file=config_file)
+config_file = 'config_camera.json'
+PiCam = PCW(config_file=config_file)
 
-# param = PiCam.get_params()
+param = PiCam.get_params()
 # print(param['shutter_speed'])
 
 # NOTE: probably need to configure resolution to be lower due to raspby
-# print('capturing image')
-# PiCam.capture_image(save_img=True)
+print('capturing image')
+img_pil, img_name = PiCam.capture_image(save_dir = out_dir)
 # PiCam.set_shutter_speed(20000)
 
 # print('sleep for 5 sec')
@@ -31,23 +35,20 @@ import numpy as np
 # print(param_new['shutter_speed'])
 # PiCam.capture_image(save_img=True)
 
-# make output folder:
-print('create output folder')
-out_dir = 'output'
-os.makedirs(out_dir, exist_ok=True)
+
 
 # now, read in images from HQ camera and perform count:
-print('get all files in image directory')
-img_dir = 'images'
-img_list = os.listdir(img_dir)
-img_list.sort()
+# print('get all files in image directory')
+# img_dir = 'images'
+# img_list = os.listdir(img_dir)
+# img_list.sort()
 
-for i, n in enumerate(img_list):
-    print(f'{i}: {n}')
+# for i, n in enumerate(img_list):
+#     print(f'{i}: {n}')
 
-# read input image (just the 0th for now)
-idx = 0
-img_name = os.path.join(img_dir, img_list[idx])
+# # read input image (just the 0th for now)
+# idx = 0
+# img_name = os.path.join(img_dir, img_list[idx])
 print(f'Investigating image: {img_name}')
 img = mvt.Image(img_name)
 
@@ -113,16 +114,16 @@ fighsv.savefig(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv_his
 
 
 # hue (colour)
-H_min = 340
+H_min = 345
 H_max = 360
 
 # saturation (amt of grey)
-S_min = 0.6
+S_min = 0.5
 S_max = 1.0
 
 # value (brightness)
-V_min = 0.6
-V_max = 0.8
+V_min = 0.5
+V_max = 0.99
 
 
 # do thresholds for each
@@ -147,23 +148,20 @@ plt.imsave(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_hsv_thresho
 # perform morphological operations to clean up the thresholded image
 # try to separate connections
 
+
+# open to get rid of salt and pepper noise
 imt = imt.open(se=np.ones((5,5)))
-imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt_open1.png'))
+imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt1_open.png'))
 
-imt = imt.close(se=np.ones((5,5)))
-imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt_close1.png'))
+# close to get rid of small interior holes
+imt = imt.close(se=np.ones((3,3)))
+imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt2_close.png'))
 
-imt = imt.open(se=np.ones((5,5)))
-imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt_open2.png'))
+imt = imt.erode(se=np.ones((19,19)))
+imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt3_erode.png'))
 
-imt = imt.close(se=np.ones((7,7)))
-imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt_close2.png'))
-
-imt = imt.open(se=np.ones((23,23)))
-imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt_open3.png'))
-
-imt = imt.erode(se=np.ones((7,7)))
-imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt_erode1.png'))
+imt = imt.dilate(se=np.ones((9,9)))
+imt.write(os.path.join(out_dir, os.path.basename(img_name)[:-4] + '_imt4_dilate.png'))
 
 # now count blobs!
 print('blob analysis')
