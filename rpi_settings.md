@@ -31,6 +31,7 @@
     sudo apt update
     sudo apt upgrade
     sudo apt install build-essential vim-gtk terminator openssh-server git gcc make cmake pkg-config zip unzip g++ curl dkms wget exfat-fuse exfat-utils guvcview net-tools ffmpeg cheese -y
+    sudo apt install tmux
 
 # setup ssh
 See https://github.com/doriantsai/linux-setup/blob/main/ssh_setup.md

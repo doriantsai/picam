@@ -66,16 +66,16 @@ np.save(os.path.join(out_dir,os.path.basename(img_name)[:-4] + '_img_red.npy'), 
 # code.interact(local=dict(globals(), **locals()))
 
 # hue (colour)
-R_min = 1
-R_max = 250
+R_min = 0
+R_max = 255
 
 # saturation (amt of grey)
-G_min = 30
-G_max = 150
+G_min = 0
+G_max = 11
 
 # value (brightness)
-B_min = 40
-B_max = 120
+B_min = 3
+B_max = 19
 
 
 # do thresholds for each
