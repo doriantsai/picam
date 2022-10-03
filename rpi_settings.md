@@ -36,6 +36,9 @@
 	sudo apt-get install -y python3-rosdep python3-rosinstall-generator python3-wstool python3-rosinstall build-essential cmake
 	sudo rosdep init && rosdep update
 	mkdir ~/ros_catkin_ws && cd ~/ros_catkin_ws
+
+- NOTE: need cv_bridge and image_transport packages, so trying full desktop install instead of ros_comm (did so by looking up rosinstall_generator and replacing the relevant input parameters from below, currently trying to install, we'll see how it goes
+
 	rosinstall_generator ros_comm --rosdistro noetic --deps --wet-only --tar > noetic-ros_comm-wet.rosinstall
 	wstool init src noetic-ros_comm-wet.rosinstall
 	rosdep install -y --from-paths src --ignore-src --rosdistro noetic -r --os=debian:buster
