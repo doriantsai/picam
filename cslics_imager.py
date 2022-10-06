@@ -30,14 +30,14 @@ def imager():
     pub = rospy.Publisher('image', Image, queue_size=10)
     rospy.init_node('picam', anonymous=True)
     # unsure of camera capture rate - need to check, but pertty sure it's slow atm
-    rate = rospy.Rate(0.25) # 0.25 Hz
+    rate = rospy.Rate(0.1) # 0.25 Hz
 
     # setup picamera # TODO load PiCameraWrapper
     picam = PiCamera()
     picam.iso = 800
     picam.sensor_mode = 2
     picam.resolution = (2592, 1944)
-    picam.shutter_speed = 10000 # 10 ms
+    picam.shutter_speed = 100000 # 100 ms
     time.sleep(2) # cam some time to adjust to conditions
 
     while not rospy.is_shutdown():
