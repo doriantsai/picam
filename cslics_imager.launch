@@ -1,0 +1,16 @@
+<launch>
+
+    <node
+        pkg="cslics_imager"
+        type="picam_publisher.py"
+        name="picam_pub"
+        output="screen"
+    />
+
+    <node
+        pkg="cslics_imager"
+        type="picam_subscriber.py"
+        name="picam_sub"
+        output="screen"
+    />
+</launch>

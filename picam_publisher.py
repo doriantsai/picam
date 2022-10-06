@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 """
-cslics imager
+cslics imager/picam publisher
 a ROS node that publishes picam status and images from HQ picam at set intervals
 author: Dorian Tsai
 email: dorian.tsai@gmail.com
@@ -16,7 +16,7 @@ from picamera import PiCamera
 from PIL import Image
 import time
 from io import BytesIO
-
+from cv_bridge import CvBridge 
 
 def capture_image(camera):
     stream = BytesIO()
@@ -46,7 +46,9 @@ def imager():
         # picam.capture('test.jpg')
         rospy.loginfo('Capture image')
         img = capture_image(picam)
-        pub.publish(img)
+
+        br = CvBridge()
+        pub.publish(br.cv2_to_imgmsg(img))
         
         # hello_str = "hello world %s" % rospy.get_time()
         # rospy.loginfo(hello_str)
