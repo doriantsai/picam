@@ -39,7 +39,7 @@
 
 - NOTE: need cv_bridge and image_transport packages, so trying full desktop install instead of ros_comm (did so by looking up rosinstall_generator and replacing the relevant input parameters from below, currently trying to install, we'll see how it goes
 
-  rosinstall_generator ros_comm common_msgs image_common vision_opencv --rosdistro noetic --deps --wet-only --tar > noetic-ros_comm-vision-wet.rosinstall
+  rosinstall_generator ros_comm common_msgs image_common image_pipeline vision_opencv vision_msgs --rosdistro noetic --deps --wet-only --tar > noetic-ros_comm-vision-wet.rosinstall
   wstool init src noetic-ros_comm-vision-wet.rosinstall
 
 	# rosinstall_generator ros_comm --rosdistro noetic --deps --wet-only --tar > noetic-ros_comm-wet.rosinstall
